@@ -24,7 +24,7 @@ jobs:
       run: cargo build --release
 
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sls-binary
         path: target/release/sls
