@@ -13,3 +13,4 @@ serde_json = "1"
 chrono = { version = "0.4", features = ["serde"] }
 assert_cmd = "2.0"
 predicates = "3.1"
+tempfile = "3.5"
