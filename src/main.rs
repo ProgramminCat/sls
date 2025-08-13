@@ -4,6 +4,7 @@ use glob::Pattern;
 use serde::Serialize;
 use walkdir::WalkDir;
 use chrono::{DateTime, NaiveDate, Utc, Local};
+use sls::parse_size;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -55,25 +56,6 @@ struct FileInfo {
     permissions: String,
 }
 
-fn parse_size(s: &str) -> Option<u64> {
-    let s = s.trim().to_uppercase();
-    let num: f64 = s
-        .chars()
-        .take_while(|c| c.is_numeric() || *c == '.')
-        .collect::<String>()
-        .parse()
-        .ok()?;
-    if s.ends_with("KB") {
-        Some((num * 1024.0) as u64)
-    } else if s.ends_with("MB") {
-        Some((num * 1024.0 * 1024.0) as u64)
-    } else if s.ends_with("GB") {
-        Some((num * 1024.0 * 1024.0 * 1024.0) as u64)
-    } else {
-        Some(num as u64)
-    }
-}
-
 fn parse_date_range(range: &str) -> Option<(NaiveDate, NaiveDate)> {
     let parts: Vec<&str> = range.split("..").collect();
     if parts.len() != 2 {
@@ -105,7 +87,14 @@ fn main() {
     let min_size = args.min_size.as_deref().and_then(parse_size);
     let max_size = args.max_size.as_deref().and_then(parse_size);
 
-    let mod_range = args.modified.as_deref().and_then(parse_date_range);
+    let mod_range = match args.modified.as_deref().map(parse_date_range) {
+        Some(Some(range)) => Some(range),
+        Some(None) => {
+            eprintln!("Invalid date range format for --modified. Expected YYYY-MM-DD..YYYY-MM-DD");
+            std::process::exit(1);
+        },
+        None => None,
+    };
 
     let include_pattern = args
         .include
