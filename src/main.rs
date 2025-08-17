@@ -5,6 +5,7 @@ use serde::Serialize;
 use walkdir::WalkDir;
 use chrono::{DateTime, NaiveDate, Utc, Local};
 use sls::parse_size;
+use sls::format_size;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -208,10 +209,10 @@ fn main() {
             };
             
             println!(
-                "{} {}  {} bytes  {}   {}",
+                "{} {}  {}  {}   {}",
                 icon,
                 name_display,
-                item.size,
+                format_size(item.size),
                 item.permissions,
                 item.modified
                     .clone()
