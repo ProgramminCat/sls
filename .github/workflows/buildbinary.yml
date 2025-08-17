@@ -1,0 +1,45 @@
+name: Build Binaries
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: List files in target/release
+        run: ls -lh target/release
+        shell: bash
+
+      - name: Upload Linux binary artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sls-linux
+          path: target/release/sls
+
+      - name: Upload Windows binary artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sls-windows
+          path: target/release/sls.exe
