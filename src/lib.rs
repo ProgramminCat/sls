@@ -17,7 +17,7 @@ pub fn parse_size(s: &str) -> Option<u64> {
     }
 }
 
-pub fn format_size(mut bytes: u64) -> String {
+pub fn format_size(bytes: u64) -> String {
     const KB: f64 = 1024.0;
     const MB: f64 = 1024.0 * 1024.0;
     const GB: f64 = 1024.0 * 1024.0 * 1024.0;
